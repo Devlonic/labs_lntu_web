@@ -7,6 +7,7 @@ namespace labs_lntu_web
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddControllers();
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
@@ -29,7 +30,7 @@ namespace labs_lntu_web
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}")
                 .WithStaticAssets();
-
+            app.MapControllers();
             app.Run();
         }
     }

@@ -1,0 +1,28 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Items list</h1>
+    <button class="btn btn-info" id="items-load-btn">Load items</button>
+    <ul id="items"></ul>
+</div>
+
+<script>
+    console.log("Items view loaded.");
+    setTimeout(()=>{
+       $(document).on("click", "#items-load-btn", loadData);
+    }, 1000);
+    async function loadData() {
+        let response = await fetch('/api/items/get');
+        let data = await response.json();
+        console.log(data);
+        const list = $("#items");
+        let html = "";
+        for(const item of data) {
+            html += `<li>${item.id}: ${item.name}</li>`
+        }
+        list.html(html);
+    }
+
+</script>

@@ -16,6 +16,10 @@ namespace labs_lntu_web.Controllers
             return View();
         }
 
+        public IActionResult Items() {
+            return View();
+        }
+
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
