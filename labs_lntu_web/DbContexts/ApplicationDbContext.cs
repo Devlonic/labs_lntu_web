@@ -4,7 +4,10 @@ using Microsoft.EntityFrameworkCore;
 namespace labs_lntu_web.DbContexts {
     public class ApplicationDbContext : DbContext {
         public DbSet<Item> Items => Set<Item>();
-        public ApplicationDbContext() => Database.EnsureCreated();
+        public DbSet<HostData> Hosts => Set<HostData>();
+        public ApplicationDbContext() {
+            Database.EnsureCreated();
+        }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
             optionsBuilder.UseSqlite("Data Source=application.db");
         }

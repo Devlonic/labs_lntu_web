@@ -2,7 +2,6 @@
 using Microsoft.AspNetCore.Mvc;
 
 namespace labs_lntu_web.Controllers.API {
-    [Route("api/[controller]")]
     public class ItemsController : ApiController {
         [HttpGet("[action]")]
         public IActionResult Get() {

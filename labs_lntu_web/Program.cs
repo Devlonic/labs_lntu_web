@@ -1,3 +1,7 @@
+using labs_lntu_web.DbContexts;
+using labs_lntu_web.Services;
+using labs_lntu_web.Tasks;
+
 namespace labs_lntu_web
 {
     public class Program
@@ -10,6 +14,15 @@ namespace labs_lntu_web
             builder.Services.AddControllers();
             builder.Services.AddControllersWithViews();
 
+            builder.Services.AddTransient<IPinger, Pinger>();
+            builder.Services.AddSingleton<HostsResultsTempStorage>();
+            
+            builder.Logging.ClearProviders();
+            builder.Logging.AddConsole();
+            builder.Logging.SetMinimumLevel(LogLevel.Information);
+            
+            builder.Services.AddHostedService<PingWorker>();
+            builder.Services.AddScoped<ApplicationDbContext>();
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
