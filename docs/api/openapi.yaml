@@ -1,0 +1,458 @@
+openapi: 3.0.4
+info:
+  title: labs_lntu_web
+  version: '1.0'
+paths:
+  /api/Hosts:
+    get:
+      tags:
+        - Hosts
+      summary: Returns a list of all registered hosts.
+      description: "Possible status codes:\r\n* 200 - Hosts returned successfully\r\n* 500 - Internal server error"
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HostData'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HostData'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HostData'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+    post:
+      tags:
+        - Hosts
+      summary: Creates a new host entry.
+      description: "After creation, the ping background worker is restarted.\r\n            \r\nPossible status codes:\r\n* 200 - Host successfully created\r\n* 400 - Invalid request model\r\n* 500 - Internal server error"
+      requestBody:
+        description: Host configuration model.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyHostRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/ModifyHostRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/ModifyHostRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/HostData'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostData'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/HostData'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+  '/api/Hosts/{id}':
+    get:
+      tags:
+        - Hosts
+      summary: Retrieves a host by its ID.
+      description: "Possible status codes:\r\n* 200 - Host found and returned\r\n* 404 - Host not found\r\n* 500 - Internal server error"
+      parameters:
+        - name: id
+          in: path
+          description: The unique identifier of the host.
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/HostData'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostData'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/HostData'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+    put:
+      tags:
+        - Hosts
+      summary: Updates an existing host record.
+      description: "Possible status codes:\r\n* 200 - Host updated successfully\r\n* 404 - Host was not found\r\n* 400 - Invalid model\r\n* 500 - Internal server error"
+      parameters:
+        - name: id
+          in: path
+          description: Host identifier.
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        description: Updated host configuration.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModifyHostRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/ModifyHostRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/ModifyHostRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/HostData'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostData'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/HostData'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+        '400':
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+    delete:
+      tags:
+        - Hosts
+      summary: Deletes a host
+      description: "Possible status codes:\r\n* 200 - Host successfully deleted\r\n* 404 - Host not found\r\n* 500 - Internal server error"
+      parameters:
+        - name: id
+          in: path
+          description: The ID of the host to delete.
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/HostData'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostData'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/HostData'
+        '404':
+          description: Not Found
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+  /api/Hosts/Statuses:
+    get:
+      tags:
+        - Hosts
+      summary: Returns the latest ping statuses from the monitoring cache
+      description: "Possible status codes:\r\n* 200 - Status data returned successfully\r\n* 500 - Internal server error"
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HostData'
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HostData'
+            text/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/HostData'
+        '500':
+          description: Internal Server Error
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/ErrorViewModel'
+  /api/Items/Get:
+    get:
+      tags:
+        - Items
+      responses:
+        '200':
+          description: OK
+  /api/Items/Create:
+    post:
+      tags:
+        - Items
+      responses:
+        '200':
+          description: OK
+components:
+  schemas:
+    ErrorViewModel:
+      type: object
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+        statusCode:
+          type: integer
+          format: int32
+          nullable: true
+        requestId:
+          type: string
+          nullable: true
+        showDetails:
+          type: boolean
+          readOnly: true
+        details:
+          type: string
+          nullable: true
+        returnUrl:
+          type: string
+          nullable: true
+      additionalProperties: false
+    HostData:
+      type: object
+      properties:
+        enabled:
+          type: boolean
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+          nullable: true
+        remoteAddress:
+          type: string
+        operatingSystem:
+          type: string
+          nullable: true
+        interface:
+          type: string
+          nullable: true
+        hostStatus:
+          $ref: '#/components/schemas/HostStatus'
+        checkedAt:
+          type: string
+          format: date-time
+        totalSuccess:
+          type: integer
+          format: int32
+        totalFailure:
+          type: integer
+          format: int32
+        totalRequests:
+          type: integer
+          format: int32
+        averageTimeMilisec:
+          type: integer
+          format: int64
+        roundTripTimeMs:
+          type: integer
+          format: int64
+        sequenceOfFailures:
+          type: integer
+          format: int32
+        latestIpStatuses:
+          type: array
+          items:
+            $ref: '#/components/schemas/IPStatus'
+        latestExceptionMsg:
+          type: string
+          nullable: true
+      additionalProperties: false
+    HostStatus:
+      enum:
+        - 0
+        - 1
+        - 2
+        - 3
+        - 4
+        - 5
+      type: integer
+      format: int32
+    IPStatus:
+      enum:
+        - 0
+        - 11002
+        - 11003
+        - 11004
+        - 11005
+        - 11006
+        - 11007
+        - 11008
+        - 11009
+        - 11010
+        - 11012
+        - 11013
+        - 11014
+        - 11015
+        - 11016
+        - 11018
+        - 11040
+        - 11041
+        - 11042
+        - 11043
+        - 11044
+        - 11045
+        - -1
+      type: integer
+      format: int32
+    ModifyHostRequest:
+      required:
+        - enabled
+        - hostName
+        - remoteAddress
+      type: object
+      properties:
+        remoteAddress:
+          minLength: 1
+          type: string
+        hostName:
+          minLength: 1
+          type: string
+        operatingSystem:
+          type: string
+        interface:
+          type: string
+        enabled:
+          type: boolean
+      additionalProperties: false
+tags:
+  - name: Hosts
+  - name: Items
