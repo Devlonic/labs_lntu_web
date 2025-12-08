@@ -20,8 +20,10 @@ namespace labs_lntu_web
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
             builder.Logging.SetMinimumLevel(LogLevel.Information);
-            
-            builder.Services.AddHostedService<PingWorker>();
+
+            builder.Services.AddSingleton<PingWorker>();
+            builder.Services.AddHostedService(sp => sp.GetRequiredService<PingWorker>());
+
             builder.Services.AddScoped<ApplicationDbContext>();
             var app = builder.Build();
 

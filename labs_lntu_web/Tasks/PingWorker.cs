@@ -7,7 +7,11 @@ using System.Diagnostics;
 using System.Net.NetworkInformation;
 
 namespace labs_lntu_web.Tasks {
-    public class PingWorker : BackgroundService {
+    public interface IPingWorker {
+        Task PingHostsAsync(IEnumerable<HostData> hosts, int maxParallel, CancellationToken ct = default);
+        Task<bool> RestartService();
+    }
+    public class PingWorker : BackgroundService, IPingWorker {
         private readonly ILogger<PingWorker> _logger;
         private readonly IServiceProvider _sp;
         private readonly HostsResultsTempStorage cache;
@@ -44,6 +48,7 @@ namespace labs_lntu_web.Tasks {
                         await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
                     }
                     await PingHostsAsync(hosts, 20, cts.Token);
+                    _logger.LogInformation("PingWorker service is restarting...");
                 }
                 catch ( Exception ex ) {
                     _logger.LogError(ex, "Error in PingWorker: {Message}", ex.Message);
@@ -73,6 +78,7 @@ namespace labs_lntu_web.Tasks {
                             cache.UpdateHost(host);
                         }
                     }
+                    _logger.LogInformation("Stopping ping task for host {Host}", host.RemoteAddress);
                 }, ct);
 
                 tasks.Add(task);
@@ -106,7 +112,7 @@ namespace labs_lntu_web.Tasks {
             if(cts == null)
                 return false;
             await cts.CancelAsync();
-            _logger.LogInformation("PingWorker service is restarting...");
+            _logger.LogInformation("PingWorker service restart requested.");
             return true;
         }
     }
