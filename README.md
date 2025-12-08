@@ -35,4 +35,5 @@ The solution aims to simplify network supervision by offering a centralized inte
 - It will not provide complex analytics such as machine learning-based prediction.
 
 ## API Documentation
-- [Reference](https://google.com)
+- [Reference](./docs/api/openapi.yaml)
+- ![Screenshot](./docs/api/swagger_screenshot.png)
