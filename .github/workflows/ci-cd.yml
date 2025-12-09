@@ -51,5 +51,5 @@ jobs:
           context: ./labs_lntu_web
           push: true
           tags: |
-              ghcr.io/${{ toLower(github.repository_owner) }}/${{ toLower(github.event.repository.name) }}-web:${{ github.sha }}
-              ghcr.io/${{ toLower(github.repository_owner) }}/${{ toLower(github.event.repository.name) }}-web:latest
+            ghcr.io/devlonic/labs_lntu_web-web:${{ github.sha }}
+            ghcr.io/devlonic/labs_lntu_web-web:latest
