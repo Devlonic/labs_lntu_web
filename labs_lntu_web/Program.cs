@@ -26,6 +26,8 @@ namespace labs_lntu_web
 
             builder.Services.AddTransient<IPinger, Pinger>();
             builder.Services.AddSingleton<HostsResultsTempStorage>();
+
+            builder.Services.AddScoped<IHostsService, HostsService>();
             
             builder.Logging.ClearProviders();
             builder.Logging.AddConsole();
