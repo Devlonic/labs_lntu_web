@@ -16,6 +16,7 @@ namespace labs_lntu_web.Tasks {
         private readonly IServiceProvider _sp;
         private readonly HostsResultsTempStorage cache;
         private CancellationTokenSource? cts;
+        public bool ServiceIsRunning { get; private set; } = false;
         public PingWorker(ILogger<PingWorker> logger, IServiceProvider sp, HostsResultsTempStorage cache) {
             _logger = logger;
             _sp = sp;
@@ -47,7 +48,9 @@ namespace labs_lntu_web.Tasks {
                         _logger.LogInformation("No hosts to ping. Waiting 10 sec...");
                         await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
                     }
+                    ServiceIsRunning = true;
                     await PingHostsAsync(hosts, 20, cts.Token);
+                    ServiceIsRunning = false;
                     _logger.LogInformation("PingWorker service is restarting...");
                 }
                 catch ( Exception ex ) {

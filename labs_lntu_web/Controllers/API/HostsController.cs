@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace labs_lntu_web.Controllers.API {
+
     /// <summary>
     /// Manages CRUD operations for monitored hosts.
     /// </summary>
