@@ -29,9 +29,32 @@
         });
     });
 
+    function fetchWithTimeout(url, options = {}, timeoutMs = 1000) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => {
+            controller.abort();
+        }, timeoutMs);
+
+        const finalOptions = {
+            ...options,
+            signal: controller.signal
+        };
+
+        return fetch(url, finalOptions)
+            .catch(err => {
+                if (err.name === 'AbortError') {
+                    $("#overloadStatus").removeClass("d-none");
+                    throw new Error("Request timed out");
+                }
+            })
+            .finally(() => {
+                clearTimeout(timeoutId);
+            });
+    }
+
     function loadHosts() {
         const statusEl = $("#serverStatus");
-        fetch(`${apiBaseUrl}/Statuses`)
+        fetchWithTimeout(`${apiBaseUrl}/Statuses`)
             .then(r => {
                 if (!r.ok) throw new Error("Failed to load hosts");
                 return r.json();
@@ -55,8 +78,8 @@
         $tbody.empty();
         let html = "";
         hosts.forEach(h => {
-            const statusClass = h.hostStatusMessage == "Online" ? "text-success" : 
-            h.hostStatus == "Delayed" ? "text-warning" : "text-danger";
+            const statusClass = h.hostStatusMessage == "Online" ? "text-success" :
+                h.hostStatus == "Delayed" ? "text-warning" : "text-danger";
             const tr = `
                 <tr>
                     <td>${h.id}</td>
@@ -80,7 +103,7 @@
     }
 
     function editHost(id) {
-        fetch(`${apiBaseUrl}/${id}`)
+        fetchWithTimeout(`${apiBaseUrl}/${id}`)
             .then(r => {
                 if (r.status === 404) throw new Error("Not found");
                 if (!r.ok) throw new Error("Failed to load host");
@@ -126,7 +149,7 @@
         const url = isEdit ? `${apiBaseUrl}/${id}` : apiBaseUrl;
         const method = isEdit ? "PUT" : "POST";
 
-        fetch(url, {
+        fetchWithTimeout(url, {
             method: method,
             headers: {
                 "Content-Type": "application/json"
@@ -149,7 +172,7 @@
     function deleteHost(id) {
         if (!confirm("Delete this host?")) return;
 
-        fetch(`${apiBaseUrl}/${id}`, {
+        fetchWithTimeout(`${apiBaseUrl}/${id}`, {
             method: "DELETE"
         })
             .then(r => {
@@ -160,6 +183,8 @@
                 alert("Error deleting host");
             });
     }
+
+    //function show
 
     function escapeHtml(text) {
         if (text == null) return "";
