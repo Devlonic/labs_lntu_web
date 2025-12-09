@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="labs_lntu_web.Tests/labs_lntu_web.Tests.csproj" Id="5f131ed5-4c7e-49e6-a674-6c43153b0629" />
   <Project Path="labs_lntu_web/labs_lntu_web.csproj" />
 </Solution>

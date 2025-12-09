@@ -1,10 +1,8 @@
-﻿using labs_lntu_web.DbContexts;
+﻿using FluentValidation;
 using labs_lntu_web.Models;
 using labs_lntu_web.Models.DTO;
 using labs_lntu_web.Services;
-using labs_lntu_web.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace labs_lntu_web.Controllers.API {
@@ -13,17 +11,14 @@ namespace labs_lntu_web.Controllers.API {
     /// Manages CRUD operations for monitored hosts.
     /// </summary>
     public class HostsController : ApiController {
-        private readonly ApplicationDbContext dbContext;
-        private readonly PingWorker pingWorker;
+        private readonly IHostsService hostsService;
         private readonly ILogger<HostsController> logger;
-        private readonly HostsResultsTempStorage hostsCacheStorage;
 
-        public HostsController(ApplicationDbContext dbContext, PingWorker pingWorker, ILogger<HostsController> logger, HostsResultsTempStorage hostsCacheStorage) {
-            this.dbContext = dbContext;
-            this.pingWorker = pingWorker;
+        public HostsController(IHostsService hostsService, ILogger<HostsController> logger) {
+            this.hostsService = hostsService;
             this.logger = logger;
-            this.hostsCacheStorage = hostsCacheStorage;
         }
+
         /// <summary>
         /// Returns a list of all registered hosts.
         /// </summary>
@@ -37,7 +32,7 @@ namespace labs_lntu_web.Controllers.API {
         [ProducesResponseType(typeof(IEnumerable<HostData>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorViewModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetAll() {
-            var hosts = await dbContext.Hosts.AsNoTracking().ToListAsync();
+            var hosts = await hostsService.GetAllAsync();
             return Ok(hosts);
         }
 
@@ -57,7 +52,7 @@ namespace labs_lntu_web.Controllers.API {
         [ProducesResponseType(typeof(ErrorViewModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorViewModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetById(int id) {
-            var host = await dbContext.Hosts.FindAsync(id);
+            var host = await hostsService.GetByIdAsync(id);
             if ( host == null )
                 return CustomNotFound(id);
 
@@ -82,18 +77,13 @@ namespace labs_lntu_web.Controllers.API {
         [ProducesResponseType(typeof(ErrorViewModel), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorViewModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> AddHost([FromBody] ModifyHostRequest request) {
-            var host = new HostData() {
-                Name = request.HostName,
-                RemoteAddress = request.RemoteAddress,
-                Enabled = request.Enabled ?? false,
-            };
-
-            dbContext.Hosts.Add(host);
-            await dbContext.SaveChangesAsync();
-
-            _ = pingWorker.RestartService();
-
-            return Ok(host);
+            try {
+                var host = await hostsService.AddHostAsync(request);
+                return Ok(host);
+            }
+            catch ( ValidationException ex ) {
+                return CreateValidationErrorResult(ex);
+            }
         }
 
         /// <summary>
@@ -115,19 +105,16 @@ namespace labs_lntu_web.Controllers.API {
         [ProducesResponseType(typeof(ErrorViewModel), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ErrorViewModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> UpdateHost(int id, [FromBody] ModifyHostRequest request) {
-            var existingHost = await dbContext.Hosts.FindAsync(id);
-            if ( existingHost == null )
-                return CustomNotFound(id);
+            try {
+                var updatedHost = await hostsService.UpdateHostAsync(id, request);
+                if ( updatedHost == null )
+                    return CustomNotFound(id);
 
-            existingHost.Name = request.HostName;
-            existingHost.RemoteAddress = request.RemoteAddress;
-            existingHost.Enabled = request.Enabled ?? false;
-
-            await dbContext.SaveChangesAsync();
-
-            _ = pingWorker.RestartService();
-
-            return Ok(existingHost);
+                return Ok(updatedHost);
+            }
+            catch ( ValidationException ex ) {
+                return CreateValidationErrorResult(ex);
+            }
         }
 
         /// <summary>
@@ -146,16 +133,11 @@ namespace labs_lntu_web.Controllers.API {
         [ProducesResponseType(typeof(ErrorViewModel), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ErrorViewModel), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> DeleteHost(int id) {
-            var existingHost = await dbContext.Hosts.FindAsync(id);
-            if ( existingHost == null )
+            var deletedHost = await hostsService.DeleteHostAsync(id);
+            if ( deletedHost == null )
                 return CustomNotFound(id);
 
-            dbContext.Hosts.Remove(existingHost);
-            await dbContext.SaveChangesAsync();
-
-            _ = pingWorker.RestartService();
-
-            return Ok(existingHost);
+            return Ok(deletedHost);
         }
 
         /// <summary>
@@ -171,7 +153,7 @@ namespace labs_lntu_web.Controllers.API {
         [ProducesResponseType(typeof(IEnumerable<HostData>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorViewModel), StatusCodes.Status500InternalServerError)]
         public IActionResult GetStatuses() {
-            var statuses = hostsCacheStorage.GetAll();
+            var statuses = hostsService.GetStatuses();
             return Ok(statuses);
         }
 
@@ -183,6 +165,18 @@ namespace labs_lntu_web.Controllers.API {
                 TraceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier
             };
             return NotFound(errorModel);
+        }
+
+        [NonAction]
+        private IActionResult CreateValidationErrorResult(ValidationException ex) {
+            var errorModel = new ErrorViewModel {
+                Title = "Validation failed.",
+                Status = StatusCodes.Status400BadRequest,
+                TraceId = Activity.Current?.Id ?? HttpContext.TraceIdentifier,
+                //Errors = ex.Errors.Select(e => e.).ToDictionary()
+            };
+
+            return BadRequest(errorModel);
         }
     }
 }

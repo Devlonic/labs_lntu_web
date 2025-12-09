@@ -112,7 +112,7 @@ namespace labs_lntu_web.Tasks {
                 return HostStatus.Delayed;
             return reply?.Status == IPStatus.Success ? HostStatus.Online : HostStatus.Offline;
         }
-        public async Task<bool> RestartService() {
+        public virtual async Task<bool> RestartService() {
             if(cts == null)
                 return false;
             await cts.CancelAsync();

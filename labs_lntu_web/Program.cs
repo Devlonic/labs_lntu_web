@@ -4,6 +4,7 @@ using labs_lntu_web.DbContexts;
 using labs_lntu_web.Services;
 using labs_lntu_web.Tasks;
 using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
+using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace labs_lntu_web
@@ -33,7 +34,9 @@ namespace labs_lntu_web
             builder.Services.AddSingleton<PingWorker>();
             builder.Services.AddHostedService(sp => sp.GetRequiredService<PingWorker>());
 
-            builder.Services.AddScoped<ApplicationDbContext>();
+            builder.Services.AddDbContext<ApplicationDbContext>(o=> {
+                o.UseSqlite("Data Source=application.db");
+            });
 
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(options=> {

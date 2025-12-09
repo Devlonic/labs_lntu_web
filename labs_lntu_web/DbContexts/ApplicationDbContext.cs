@@ -8,8 +8,8 @@ namespace labs_lntu_web.DbContexts {
         public ApplicationDbContext() {
             Database.EnsureCreated();
         }
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
-            optionsBuilder.UseSqlite("Data Source=application.db");
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) {
+            
         }
     }
 }
