@@ -1,4 +1,4 @@
-# Pinger System
+# Pinger System ![CI Status](https://github.com/Devlonic/labs_lntu_web/actions/workflows/ci-cd.yml/badge.svg)
 
 ## Overview  
 Pinger is a monitoring system designed to continuously ping configured hosts and record connectivity statistics. It provides historical analysis of response times, including minimum, maximum, and average latency metrics. The system enables administrators and users to track network stability and react to issues promptly.  
@@ -38,8 +38,12 @@ The solution aims to simplify network supervision by offering a centralized inte
 - [Reference](./docs/api/openapi.yaml)
 - ![Screenshot](./docs/api/swagger_screenshot.png)
 
-## Docker Running
+## Local docker build and run
 - `cd .\labs_lntu_web`
 - `docker build -t pinger-dotnet:1.0.1 .`
 - `docker run --name pinger-2 --rm -d -p 8080:8080 pinger-dotnet:1.0.1`
 - `docker logs -f pinger-2`
+
+## CI/CD run
+- `docker pull ghcr.io/devlonic/labs_lntu_web-web:latest`
+- `docker run -p 7777:8080 ghcr.io/devlonic/labs_lntu_web-web:latest`
