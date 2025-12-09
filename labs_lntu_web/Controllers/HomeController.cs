@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using labs_lntu_web.Models;
+using labs_lntu_web.Models.DTO;
 using Microsoft.AspNetCore.Mvc;
 
 namespace labs_lntu_web.Controllers
@@ -23,7 +24,7 @@ namespace labs_lntu_web.Controllers
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return View(new ErrorViewModel { });
         }
     }
 }

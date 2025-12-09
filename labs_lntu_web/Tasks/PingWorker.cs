@@ -75,6 +75,7 @@ namespace labs_lntu_web.Tasks {
                         }
                         catch ( Exception e ) {
                             UpdateHostStatus(host, null, e);
+                            _logger.LogWarning("Error pinging {Host}: {Message}", host.RemoteAddress, $"{e.Message}: {e.InnerException?.Message}");
                             cache.UpdateHost(host);
                         }
                     }
@@ -97,7 +98,7 @@ namespace labs_lntu_web.Tasks {
             host.LatestIpStatuses.Add(reply?.Status ?? IPStatus.Unknown);
             host.RoundTripTimeMs = reply?.Status == IPStatus.Success ? reply.RoundtripTime : -1;
             if ( exception != null )
-                host.LatestExceptionMsg = exception.Message;
+                host.LatestExceptionMsg = $"{exception.Message}: {exception.InnerException?.Message}";
         }
         public virtual HostStatus GetHostStatus(HostData host, PingReply? reply) {
             if ( !host.Enabled )
