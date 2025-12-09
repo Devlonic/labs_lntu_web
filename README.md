@@ -37,3 +37,9 @@ The solution aims to simplify network supervision by offering a centralized inte
 ## API Documentation
 - [Reference](./docs/api/openapi.yaml)
 - ![Screenshot](./docs/api/swagger_screenshot.png)
+
+## Docker Running
+- `cd .\labs_lntu_web`
+- `docker build -t pinger-dotnet:1.0.1 .`
+- `docker run --name pinger-2 --rm -d -p 8080:8080 pinger-dotnet:1.0.1`
+- `docker logs -f pinger-2`
