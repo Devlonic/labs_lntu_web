@@ -153,7 +153,24 @@ namespace labs_lntu_web.Controllers.API {
         [ProducesResponseType(typeof(IEnumerable<HostData>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorViewModel), StatusCodes.Status500InternalServerError)]
         public IActionResult GetStatuses() {
-            var statuses = hostsService.GetStatuses();
+            var statuses = hostsService.GetStatuses().Select(s=> {
+                var status = new HostData {
+                    Id = s.Id,
+                    Name = s.Name,
+                    RemoteAddress = s.RemoteAddress,
+                    HostStatus = s.HostStatus,
+                    CheckedAt = s.CheckedAt,
+                    RoundTripTimeMs = s.RoundTripTimeMs,
+                    HostStatusMessage = s.HostStatus.ToString(),
+                    LatestExceptionMsg = s.LatestExceptionMsg,
+                    LatestIpStatuses = s.LatestIpStatuses,
+                    TotalFailure = s.TotalFailure,
+                    TotalRequests = s.TotalRequests,
+                    TotalSuccess = s.TotalSuccess,
+                    AverageTimeMilisec = s.AverageTimeMilisec,
+                };
+                return status;
+            }).OrderBy(s=>s.RemoteAddress);
             return Ok(statuses);
         }
 

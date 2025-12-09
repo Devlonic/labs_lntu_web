@@ -30,20 +30,7 @@ namespace labs_lntu_web.Tasks {
                     using var scope = _sp.CreateScope();
                     var dbContext = scope.ServiceProvider.GetRequiredService<DbContexts.ApplicationDbContext>();
                     var hosts = dbContext.Hosts.ToList();
-                    //var hosts = new List<HostData>() {
-                    //new HostData() {
-                    //    Id = 1,
-                    //    RemoteAddress = "1.1.1.1",
-                    //    Enabled = true,
-                    //    Name = "Cloudflare DNS",
-                    //    },
-                    //new HostData() {
-                    //    Id = 2,
-                    //    RemoteAddress = "google.com",
-                    //    Enabled = true,
-                    //    Name = "Google",
-                    //    },
-                    //};
+                    cache.Init(hosts);
                     if ( hosts.Count == 0 ) {
                         _logger.LogInformation("No hosts to ping. Waiting 10 sec...");
                         await Task.Delay(TimeSpan.FromSeconds(10), stoppingToken);
@@ -76,9 +63,13 @@ namespace labs_lntu_web.Tasks {
                             _logger.LogInformation("Pinged {Host} - Status: {Status}, RTT: {RTT}ms", host.RemoteAddress, reply.Status, reply.RoundtripTime);
                             await Task.Delay(TimeSpan.FromSeconds(1), ct);
                         }
+                        catch ( TaskCanceledException ) {
+                            _logger.LogInformation("Ping task for host {Host} was cancelled.", host.RemoteAddress);
+                        }
                         catch ( Exception e ) {
                             UpdateHostStatus(host, null, e);
                             _logger.LogWarning("Error pinging {Host}: {Message}", host.RemoteAddress, $"{e.Message}: {e.InnerException?.Message}");
+                            await Task.Delay(TimeSpan.FromSeconds(10));
                             cache.UpdateHost(host);
                         }
                     }

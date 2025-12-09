@@ -17,6 +17,5 @@ namespace labs_lntu_web.Services {
         public virtual void UpdateHost(HostData host) {
             _results.AddOrUpdate(host.Id, host, (key, oldValue) => host);
         }
-
     }
 }

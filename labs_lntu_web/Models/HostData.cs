@@ -20,6 +20,8 @@ namespace labs_lntu_web.Models {
         [NotMapped]
         public int SequenceOfFailures { get; set; } = 0;
         [NotMapped]
+        public string? HostStatusMessage { get; set; }
+        [NotMapped]
         public List<IPStatus> LatestIpStatuses { get; set; } = new();
         [NotMapped]
         public string? LatestExceptionMsg { get; set; }
